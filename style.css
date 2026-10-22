@@ -873,8 +873,10 @@ h3 {
     padding: 10px 14px;
   }
 
+  /* כרטיס התאריך ברוחב התוכן שלו בלבד (לא נמתח לכל השורה) */
   .date-card:first-child {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
+    padding-inline: 20px;
   }
 
   .date-card:last-child {
