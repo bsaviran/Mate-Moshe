@@ -1,7 +1,18 @@
 /* =========================================================
    ✏️  הגדרות האתר – כאן עורכים את זמני התפילות
    ---------------------------------------------------------
-   • כל שעה נכתבת בפורמט "HH:MM" (למשל "06:30" או "18:45").
+   כל תפילה מוגדרת באחת משלוש דרכים (כמו ב-MyGabay):
+     • שעה קבועה:  { label: "...", time: "08:10" }
+     • לפי נוסחה:   { label: "...", base: "sunset", offset: "-1:15" }
+                    (base = זמן בסיס, offset = שעות:דקות להוסיף "+" או להחסיר "-")
+     • ללא שעה:     { label: "..." }
+
+   זמני בסיס אפשריים (לפי שיטת אור החיים):
+     "sunrise"        – נץ החמה
+     "sunset"         – שקיעה
+     "tzeit"          – צאת הכוכבים (13.5 דקות זמניות אחרי השקיעה)
+     "motzaeiShabbat" – מוצאי שבת
+
    • אפשר להוסיף או למחוק שורות – פשוט מעתיקים שורה קיימת.
    • אחרי שמירה, מרעננים את הדף בדפדפן.
    ========================================================= */
@@ -14,43 +25,51 @@ const CONFIG = {
   // true = מוסיף "(לדוגמה)" ליד כותרת תפילות החול.
   isSample: false,
 
-  // ---------- תפילות ימי חול ----------
+  // ---------- מיקום לחישוב זמני היום (חולון) ----------
+  location: { latitude: 32.0158, longitude: 34.7874, tzid: "Asia/Jerusalem" },
+
+  // עיגול זמני תפילות שמחושבים לפי נוסחה (בדקות), כמו ב-MyGabay. 1 = ללא עיגול.
+  roundToMinutes: 5,
+
+  // ---------- תפילות ימי חול (מחושבות לפי זמני היום) ----------
   weekdayNote: "",
   weekday: {
     shacharit: [
-      { label: "שחרית נץ", time: "06:10" },
+      { label: "שחרית נץ", base: "sunrise", offset: "-0:40" },
       { label: "מניין שני – הודו", time: "07:45" },
     ],
     mincha: [
       { label: "מנחה גדולה", time: "13:10" },
-      { label: "מנחה", time: "17:35" },
+      { label: "מנחה", base: "tzeit", offset: "-0:45" },
     ],
     arvit: [
-      { label: "ערבית", time: "18:20" },
+      { label: "ערבית", base: "tzeit", offset: "+0:00" },
       { label: "ערבית מניין שני", time: "21:15" },
     ],
   },
 
   // ---------- תפילות שבת ----------
-  // יש לעדכן את שם הפרשה בכל שבוע
-  shabbatNote: "פרשת לך לך",
+  // שם הפרשה מתעדכן אוטומטית.
+  // בערב שבת זמני הבסיס הם של יום שישי, וביום שבת – של שבת.
   shabbat: {
     erevShabbat: {
       title: "ערב שבת",
+      day: "friday",
       items: [
-        { label: "שיעור", time: "17:00" },
-        { label: "שיר השירים", time: "17:30" },
-        { label: "מנחה", time: "" }, // אין שעה בלוח – להשלים
+        { label: "שיעור", base: "sunset", offset: "-1:15" },
+        { label: "שיר השירים", base: "sunset", offset: "-0:45" },
+        { label: "מנחה" },
       ],
     },
     shabbatDay: {
       title: "יום שבת",
+      day: "saturday",
       items: [
         { label: "שיעור", time: "06:45" },
         { label: "שחרית – הודו", time: "08:10" },
-        { label: "שיעור", time: "14:55" },
-        { label: "מנחה", time: "16:55" },
-        { label: "ערבית מוצאי שבת", time: "18:15" },
+        { label: "שיעור", base: "motzaeiShabbat", offset: "-3:35" },
+        { label: "מנחה", base: "motzaeiShabbat", offset: "-1:35" },
+        { label: "ערבית מוצאי שבת", base: "motzaeiShabbat", offset: "-0:15" },
       ],
     },
   },
@@ -83,12 +102,9 @@ const CONFIG = {
 
   // ---------- פרנסי השבוע ----------
   // כל שורה במערך מוצגת בשורה נפרדת. השורה השנייה (השם) מודגשת.
-  parnasim: [
-    "הלימוד השבוע להצלחת",
-    "רועי לוי הי״ו",
-    "והמסייעים הי״ו",
-    "בגשמיות וברוחניות ובכל מילי דמיטב",
-  ],
+  // רשימה ריקה [] = האזור מוסתר. דוגמה להחזרה:
+  //   parnasim: ["הלימוד השבוע להצלחת", "פלוני בן פלוני הי״ו", "בגשמיות וברוחניות"],
+  parnasim: [],
 };
 
 /* =========================================================
@@ -180,7 +196,7 @@ function renderTimeList(items) {
     li.dataset.time = item.time;
     li.innerHTML = `<span class="t-label"></span><span class="t-time"></span>`;
     li.querySelector(".t-label").textContent = item.label;
-    li.querySelector(".t-time").textContent = item.time || "—";
+    li.querySelector(".t-time").textContent = item.time || "";
     ul.appendChild(li);
   });
   return ul;
@@ -240,6 +256,7 @@ function renderLessons() {
 function renderParnasim() {
   const box = document.getElementById("parnasim-text");
   box.innerHTML = "";
+  box.closest("section").hidden = CONFIG.parnasim.length === 0;
   CONFIG.parnasim.forEach((line, i) => {
     const p = document.createElement("p");
     p.textContent = line;
@@ -267,7 +284,7 @@ function findNextPrayer(now) {
       );
 
   return candidates
-    .filter((p) => toMinutes(p.time) > nowMin)
+    .filter((p) => p.time && toMinutes(p.time) > nowMin)
     .sort((a, b) => toMinutes(a.time) - toMinutes(b.time))[0];
 }
 
@@ -291,7 +308,7 @@ function renderNextPrayer(now) {
   const diff = toMinutes(next.time) - (now.getHours() * 60 + now.getMinutes());
   const hours = Math.floor(diff / 60);
   const mins = diff % 60;
-  const countdown = hours > 0 ? `בעוד ${hours} שע׳ ו-${mins} דק׳` : `בעוד ${mins} דקות`;
+  const countdown = hours > 0 ? `בעוד ${hours} שע׳ ו-${mins} דק׳` : mins === 1 ? "בעוד דקה" : `בעוד ${mins} דקות`;
 
   box.innerHTML = `
     <div>
@@ -311,6 +328,119 @@ function renderNextPrayer(now) {
   });
 }
 
+/* ---------- חישוב זמני תפילות לפי נוסחאות (בעזרת Hebcal) ---------- */
+
+const HEBCAL_URL = "https://www.hebcal.com";
+
+function isoDate(date) {
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+// יום שישי של השבת הקרובה (בשבת עצמה – יום שישי של אתמול)
+function upcomingFriday(now) {
+  const friday = new Date(now);
+  const daysToFriday = now.getDay() === 6 ? -1 : 5 - now.getDay();
+  friday.setDate(now.getDate() + daysToFriday);
+  return friday;
+}
+
+// "2026-10-23T17:59:48+03:00" -> שניות מחצות (לפי השעון המקומי בישראל)
+function isoToSeconds(iso) {
+  const [h, m, s] = iso.slice(11, 19).split(":").map(Number);
+  return h * 3600 + m * 60 + s;
+}
+
+// "-1:15" -> -4500 שניות
+function offsetToSeconds(offset = "0:00") {
+  const sign = offset.trim().startsWith("-") ? -1 : 1;
+  const [h, m] = offset.replace(/[+-]/, "").split(":").map(Number);
+  return sign * (h * 3600 + m * 60);
+}
+
+// עיגול לכפולה הקרובה של roundTo דקות (למשל 16:53:50 -> 16:55)
+function secondsToTime(seconds, roundTo = 1) {
+  const totalMin = Math.round(seconds / 60 / roundTo) * roundTo;
+  return `${pad(Math.floor(totalMin / 60))}:${pad(totalMin % 60)}`;
+}
+
+async function fetchZmanim(date) {
+  const { latitude, longitude, tzid } = CONFIG.location;
+  const url = `${HEBCAL_URL}/zmanim?cfg=json&sec=1&latitude=${latitude}&longitude=${longitude}&tzid=${tzid}&date=${isoDate(date)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Hebcal ${res.status}`);
+  return (await res.json()).times;
+}
+
+async function fetchParasha(friday) {
+  const { latitude, longitude, tzid } = CONFIG.location;
+  const url = `${HEBCAL_URL}/shabbat?cfg=json&leyning=off&latitude=${latitude}&longitude=${longitude}&tzid=${tzid}` +
+    `&gy=${friday.getFullYear()}&gm=${friday.getMonth() + 1}&gd=${friday.getDate()}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Hebcal ${res.status}`);
+  const item = (await res.json()).items.find((i) => i.category === "parashat");
+  return item ? item.hebrew.replace("־", " ") : "";
+}
+
+// זמני הבסיס של יום מסוים, בשניות מחצות
+function computeBases(dayZmanim, saturdayZmanim) {
+  const sunrise = isoToSeconds(dayZmanim.sunrise);
+  const sunset = isoToSeconds(dayZmanim.sunset);
+  const zmanitMinute = (sunset - sunrise) / 720; // דקה זמנית = אורך היום חלקי 720
+  return {
+    sunrise,
+    sunset,
+    tzeit: sunset + 13.5 * zmanitMinute,
+    motzaeiShabbat: isoToSeconds(saturdayZmanim.tzeit7083deg),
+  };
+}
+
+function applyFormulas(items, bases) {
+  items.forEach((item) => {
+    if (!item.base) return;
+    const base = bases[item.base];
+    item.time = base !== undefined
+      ? secondsToTime(base + offsetToSeconds(item.offset), CONFIG.roundToMinutes)
+      : "";
+  });
+}
+
+let zmanimDate = ""; // התאריך שעבורו חושבו הזמנים
+
+async function loadZmanimTimes() {
+  const today = new Date();
+  const friday = upcomingFriday(today);
+  const saturday = new Date(friday);
+  saturday.setDate(friday.getDate() + 1);
+  zmanimDate = isoDate(today);
+
+  try {
+    const [todayZmanim, fridayZmanim, saturdayZmanim, parasha] = await Promise.all([
+      fetchZmanim(today),
+      fetchZmanim(friday),
+      fetchZmanim(saturday),
+      fetchParasha(friday).catch(() => ""),
+    ]);
+
+    const todayBases = computeBases(todayZmanim, saturdayZmanim);
+    Object.values(CONFIG.weekday).forEach((items) => applyFormulas(items, todayBases));
+
+    const basesByDay = {
+      friday: computeBases(fridayZmanim, saturdayZmanim),
+      saturday: computeBases(saturdayZmanim, saturdayZmanim),
+    };
+    Object.values(CONFIG.shabbat).forEach((block) => applyFormulas(block.items, basesByDay[block.day]));
+
+    document.getElementById("shabbat-note").textContent = parasha;
+  } catch (e) {
+    // אין חיבור לשירות – תפילות שתלויות בנוסחה יוצגו ללא שעה
+    console.error("טעינת זמני היום נכשלה:", e);
+  }
+
+  renderWeekday();
+  renderShabbat();
+  tick();
+}
+
 /* ---------- אנימציית הופעה בגלילה ---------- */
 
 function setupReveal() {
@@ -318,7 +448,7 @@ function setupReveal() {
   if (reduceMotion || !("IntersectionObserver" in window)) return;
 
   const targets = document.querySelectorAll(
-    ".next-prayer, .section-head, .parnasim h2, .prayer-card, .shabbat, .shabbat-block, .parnasim-card"
+    ".next-prayer, .section-head, .parnasim h2, .prayer-card, .shabbat, .shabbat-block, .gallery-frame, .parnasim-card"
   );
 
   const observer = new IntersectionObserver(
@@ -350,6 +480,21 @@ function setupReveal() {
   });
 }
 
+/* ---------- הגדלת תמונה ---------- */
+
+function setupLightbox() {
+  const dialog = document.getElementById("lightbox");
+  if (!dialog.showModal) return; // דפדפן ישן מאוד
+
+  document.getElementById("kollel-open").addEventListener("click", () => dialog.showModal());
+  document.getElementById("lightbox-close").addEventListener("click", () => dialog.close());
+
+  // לחיצה על הרקע הכהה (מחוץ לתמונה) סוגרת את החלון
+  dialog.addEventListener("click", (e) => {
+    if (e.target.tagName !== "IMG") dialog.close();
+  });
+}
+
 /* ---------- עדכון שוטף ---------- */
 
 function tick() {
@@ -358,6 +503,9 @@ function tick() {
   document.getElementById("hebrew-date").textContent = getHebrewDate(now) || "—";
   document.getElementById("gregorian-date").textContent = getGregorianDate(now);
   renderNextPrayer(now);
+
+  // עבר חצות והדף עדיין פתוח – מחשבים מחדש את זמני היום החדש
+  if (zmanimDate && zmanimDate !== isoDate(now)) loadZmanimTimes();
 }
 
 function init() {
@@ -370,15 +518,16 @@ function init() {
   document.getElementById("footer-name").textContent = `${CONFIG.synagogueName} ${CONFIG.tagline}`;
   document.getElementById("year").textContent = new Date().getFullYear();
   document.getElementById("weekday-note").textContent = CONFIG.weekdayNote + suffix;
-  document.getElementById("shabbat-note").textContent = CONFIG.shabbatNote;
-  renderWeekday();
-  renderShabbat();
   renderLessons();
   renderParnasim();
-  setupReveal();
-
+  setupLightbox();
   tick();
-  setInterval(tick, 30 * 1000); // עדכון כל 30 שניות
+
+  // קודם מחשבים את הזמנים, ורק אז מציגים את התפילות ומפעילים את האנימציה
+  loadZmanimTimes().then(() => {
+    setupReveal();
+    setInterval(tick, 30 * 1000); // עדכון כל 30 שניות
+  });
 }
 
 document.addEventListener("DOMContentLoaded", init);

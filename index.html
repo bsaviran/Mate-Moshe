@@ -14,12 +14,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
 
   <!-- קובץ העיצוב -->
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=19">
 </head>
 <body>
 
   <!-- כותרת עליונה -->
   <header class="hero">
+    <!-- תמונת בית הכנסת ברקע (עמומה) -->
+    <div class="hero-bg" aria-hidden="true"></div>
     <div class="hero-inner">
       <div class="logo-frame">
         <img src="logo.png" alt="לוגו בית הכנסת מטה משה – היכל רבנו יורם, חולון" class="logo" width="550" height="564">
@@ -31,12 +33,11 @@
 
       <div class="dates">
         <div class="date-card">
-          <span class="date-label">תאריך עברי</span>
-          <span class="date-value" id="hebrew-date">—</span>
-        </div>
-        <div class="date-card">
-          <span class="date-label">תאריך לועזי</span>
-          <span class="date-value" id="gregorian-date">—</span>
+          <span class="date-label">תאריך</span>
+          <span class="date-values">
+            <span class="date-value" id="hebrew-date">—</span>
+            <span class="date-sub" id="gregorian-date">—</span>
+          </span>
         </div>
         <div class="date-card">
           <span class="date-label">השעה כעת</span>
@@ -74,13 +75,25 @@
     </section>
 
     <!-- שיעורי תורה -->
-    <section class="section" aria-labelledby="lessons-title">
+    <section class="section lessons-panel" aria-labelledby="lessons-title">
       <div class="section-head">
         <h2 id="lessons-title">שיעורי תורה</h2>
       </div>
       <div class="prayer-grid lessons-grid" id="lessons">
         <!-- הכרטיסים נוצרים אוטומטית מתוך script.js -->
       </div>
+    </section>
+
+    <!-- כולל אברכים -->
+    <section class="section kollel" aria-labelledby="kollel-title">
+      <div class="section-head">
+        <h2 id="kollel-title">כולל אברכים מצטיינים ״מטה משה״</h2>      </div>
+      <figure class="gallery-frame">
+        <button type="button" class="gallery-open" id="kollel-open" aria-label="הגדלת תמונת אברכי הכולל">
+          <img src="kollel.jpg" alt="אברכי כולל מטה משה, שנת תשפ״ו" width="2758" height="1548" loading="lazy">
+          <span class="zoom-badge" aria-hidden="true">🔍 לחצו להגדלה</span>
+        </button>
+      </figure>
     </section>
 
     <!-- פרנסי השבוע -->
@@ -96,7 +109,15 @@
     <p class="copyright">כל הזכויות שמורות ל-<bdi>bsaviran</bdi></p>
   </footer>
 
+  <!-- חלון הגדלת תמונה -->
+  <dialog class="lightbox" id="lightbox" aria-label="תמונה מוגדלת">
+    <button type="button" class="lightbox-close" id="lightbox-close" aria-label="סגירה">✕</button>
+    <div class="lightbox-scroll">
+      <img src="kollel.jpg" alt="אברכי כולל מטה משה, שנת תשפ״ו">
+    </div>
+  </dialog>
+
   <!-- קובץ הלוגיקה והנתונים -->
-  <script src="script.js?v=3"></script>
+  <script src="script.js?v=19"></script>
 </body>
 </html>
