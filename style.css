@@ -840,6 +840,28 @@ h3 {
     padding: 40px 16px 84px;
   }
 
+  /* בטלפון: כל הבית כנסת ברוחב המסך, עם מעבר רך למעלה ולמטה */
+  .hero-bg {
+    background-size: 100% auto;
+    background-position: center 150px;
+    animation: none;
+    transform: none;
+    -webkit-mask-image: linear-gradient(180deg, transparent 110px, #000 210px, #000 calc(150px + 72vw), transparent calc(190px + 82vw));
+    mask-image: linear-gradient(180deg, transparent 110px, #000 210px, #000 calc(150px + 72vw), transparent calc(190px + 82vw));
+  }
+
+  .hero::before {
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(230, 194, 122, 0.22), transparent 70%),
+      linear-gradient(
+        180deg,
+        rgba(8, 18, 41, 0.80) 0%,
+        rgba(13, 27, 62, 0.64) 45%,
+        rgba(8, 18, 41, 0.80) 85%,
+        var(--sapphire-950) 100%
+      );
+  }
+
   /* בטלפון: התאריך והשעה זה לצד זה בשורה אחת */
   .dates {
     flex-wrap: nowrap;
