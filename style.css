@@ -842,12 +842,11 @@ h3 {
 
   /* בטלפון: כל הבית כנסת ברוחב המסך, עם מעבר רך למעלה ולמטה */
   .hero-bg {
-    background-size: 100% auto;
-    background-position: center 150px;
-    animation: none;
-    transform: none;
-    -webkit-mask-image: linear-gradient(180deg, transparent 110px, #000 210px, #000 calc(150px + 72vw), transparent calc(190px + 82vw));
-    mask-image: linear-gradient(180deg, transparent 110px, #000 210px, #000 calc(150px + 72vw), transparent calc(190px + 82vw));
+    /* הכניסה לבית הכנסת נמצאת ב-45% מרוחב התמונה – מגדילים מעט ומיישרים כך שתהיה במרכז המסך */
+    background-size: 110% auto;
+    background-position: left 0 top 150px;
+    -webkit-mask-image: linear-gradient(180deg, transparent 110px, #000 210px, #000 calc(150px + 80vw), transparent calc(190px + 90vw));
+    mask-image: linear-gradient(180deg, transparent 110px, #000 210px, #000 calc(150px + 80vw), transparent calc(190px + 90vw));
   }
 
   .hero::before {
