@@ -1,0 +1,682 @@
+/* =========================================================
+   עיצוב אתר זמני תפילות
+   צבעים: כחול ספיר עמוק, זהב שמפניה, שנהב, ובורדו לשבת
+   ========================================================= */
+
+:root {
+  /* כחול ספיר */
+  --sapphire-950: #081229;
+  --sapphire-900: #0d1b3e;
+  --sapphire-800: #142a5c;
+  --sapphire-700: #1d3b7a;
+
+  /* זהב שמפניה */
+  --gold-600: #b8862f;
+  --gold-500: #d4a64a;
+  --gold-400: #e6c27a;
+  --gold-200: #f5e6c4;
+  --gold-gradient: linear-gradient(135deg, #f3d48a 0%, #d4a64a 45%, #b8862f 100%);
+
+  /* שבת: כחול מלכותי שמעמיק לאינדיגו של לילה (בהשראת הלוגו) */
+  --royal-900: #120f3d;
+  --royal-800: #1b2470;
+  --royal-700: #2a44a8;
+  --royal-glow: rgba(120, 160, 255, 0.22);
+
+  /* צבעי הדגשה לכל תפילה */
+  --shacharit: #e8915a;
+  --shacharit-soft: #fdf0e6;
+  --mincha: #d4a64a;
+  --mincha-soft: #fbf4e2;
+  --arvit: #5b5fc7;
+  --arvit-soft: #eeeefb;
+
+  /* רקעים וטקסט */
+  --ivory: #f8f4ec;
+  --paper: #fffdf9;
+  --ink: #1a2033;
+  --muted: #6f7487;
+  --line: #ebe3d1;
+
+  --radius: 20px;
+  --shadow: 0 6px 24px rgba(13, 27, 62, 0.07);
+  --shadow-lg: 0 24px 60px rgba(13, 27, 62, 0.18);
+
+  --font-display: "Frank Ruhl Libre", "Times New Roman", serif;
+  --font-body: "Heebo", "Segoe UI", Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 15% 40%, rgba(212, 166, 74, 0.07), transparent 40%),
+    radial-gradient(circle at 85% 75%, rgba(29, 59, 122, 0.06), transparent 40%),
+    var(--ivory);
+  background-attachment: fixed;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* ---------- כותרת עליונה ---------- */
+.hero {
+  position: relative;
+  color: #fff;
+  text-align: center;
+  padding: 64px 16px 100px;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(230, 194, 122, 0.28), transparent 70%),
+    radial-gradient(circle at 10% 90%, rgba(91, 95, 199, 0.25), transparent 45%),
+    linear-gradient(165deg, var(--sapphire-700) 0%, var(--sapphire-900) 55%, var(--sapphire-950) 100%);
+  overflow: hidden;
+}
+
+/* דוגמת נקודות עדינה ברקע */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 22px 22px;
+  pointer-events: none;
+}
+
+/* קו זהב דקורטיבי בתחתית */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold-400), var(--gold-500), var(--gold-400), transparent);
+}
+
+.hero-inner {
+  position: relative;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* לוגו עם מסגרת זהב והילה */
+.logo-frame {
+  position: relative;
+  width: clamp(170px, 32vw, 240px);
+  aspect-ratio: 550 / 564;
+  margin: 0 auto 26px;
+  padding: 4px;
+  border-radius: 30px;
+  background: var(--gold-gradient);
+  box-shadow:
+    0 0 0 6px rgba(230, 194, 122, 0.12),
+    0 0 60px rgba(230, 194, 122, 0.35),
+    0 24px 50px rgba(0, 0, 0, 0.45);
+  animation: logo-in 0.9s ease-out both;
+}
+
+.logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 26px;
+  /* חיתוך השוליים הבהירים שבקובץ התמונה */
+  clip-path: inset(2.5% round 26px);
+  transform: scale(1.05);
+}
+
+@keyframes logo-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-frame {
+    animation: none;
+  }
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.9rem;
+  letter-spacing: 3px;
+  color: var(--gold-400);
+}
+
+.hero h1 {
+  font-size: clamp(2.2rem, 7vw, 3.8rem);
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  color: #fff;
+  text-shadow: 0 2px 20px rgba(230, 194, 122, 0.25);
+}
+
+.tagline {
+  margin: 8px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+  font-weight: 500;
+  background: var(--gold-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.subtitle {
+  color: rgba(255, 255, 255, 0.7);
+  margin: 10px 0 0;
+  font-weight: 300;
+  font-size: 1rem;
+}
+
+.dates {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 40px;
+}
+
+.date-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 14px;
+  border: 1px solid rgba(230, 194, 122, 0.3);
+  border-radius: var(--radius);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.02));
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.date-label {
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  color: var(--gold-400);
+}
+
+.date-value {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.clock {
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+}
+
+/* ---------- תוכן ראשי ---------- */
+.container {
+  max-width: 1100px;
+  margin: -60px auto 0;
+  padding: 0 16px 48px;
+  position: relative;
+}
+
+/* ---------- התפילה הבאה ---------- */
+.next-prayer {
+  position: relative;
+  background: var(--paper);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 22px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  overflow: hidden;
+}
+
+/* פס זהב בצד */
+.next-prayer::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 6px;
+  background: var(--gold-gradient);
+}
+
+.next-prayer .np-label {
+  color: var(--gold-600);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+.next-prayer .np-name {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--sapphire-900);
+}
+
+.next-prayer .np-time {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  background: var(--gold-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.next-prayer .np-countdown {
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* ---------- אזורים ---------- */
+.section {
+  margin-top: 52px;
+}
+
+.section-head {
+  margin-bottom: 22px;
+}
+
+.section h2 {
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+  color: var(--sapphire-900);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section h2::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to left, transparent, var(--gold-400));
+}
+
+.section-note {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.section-note:empty {
+  display: none;
+}
+
+/* ---------- כרטיסי תפילות חול ---------- */
+.prayer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.prayer-card {
+  --accent: var(--gold-500);
+  --accent-soft: var(--gold-200);
+  position: relative;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 26px 24px 18px;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* פס צבע עליון לפי סוג התפילה */
+.prayer-card::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 4px;
+  background: var(--accent);
+}
+
+.prayer-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.prayer-card.prayer-shacharit {
+  --accent: var(--shacharit);
+  --accent-soft: var(--shacharit-soft);
+}
+
+.prayer-card.prayer-mincha {
+  --accent: var(--mincha);
+  --accent-soft: var(--mincha-soft);
+}
+
+.prayer-card.prayer-arvit {
+  --accent: var(--arvit);
+  --accent-soft: var(--arvit-soft);
+}
+
+.prayer-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.55rem;
+  color: var(--sapphire-900);
+  padding-bottom: 14px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.prayer-card .icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--accent-soft);
+  font-size: 1.3rem;
+}
+
+/* שורות זמנים (משותף לחול ולשבת) */
+.time-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.time-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--line);
+}
+
+.time-list li:last-child {
+  border-bottom: none;
+}
+
+.time-list .t-label {
+  color: var(--ink);
+}
+
+.time-list .t-time {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--sapphire-800);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  /* שומר על סדר נכון של טווחי שעות כמו 20:00-21:15 */
+  unicode-bidi: plaintext;
+}
+
+.prayer-card .time-list li.is-next {
+  background: var(--accent-soft);
+  margin-inline: -12px;
+  padding-inline: 12px;
+  border-radius: 10px;
+  border-bottom-color: transparent;
+}
+
+.prayer-card .time-list li.is-next .t-time {
+  color: var(--accent);
+}
+
+.time-list li.is-next .t-label::after {
+  content: "הבאה";
+  font-size: 0.7rem;
+  background: var(--gold-gradient);
+  color: #fff;
+  border-radius: 999px;
+  padding: 2px 9px;
+  margin-inline-start: 8px;
+  vertical-align: middle;
+}
+
+/* ---------- אזור שבת ---------- */
+.shabbat {
+  position: relative;
+  background:
+    radial-gradient(ellipse 60% 55% at 85% 0%, var(--royal-glow), transparent 70%),
+    radial-gradient(ellipse 70% 50% at 10% 100%, rgba(230, 194, 122, 0.16), transparent 70%),
+    linear-gradient(155deg, var(--royal-700) 0%, var(--royal-800) 45%, var(--royal-900) 100%);
+  color: #fff;
+  border-radius: calc(var(--radius) + 6px);
+  padding: 38px 32px;
+  box-shadow: 0 24px 60px rgba(18, 15, 61, 0.35);
+  border: 1px solid rgba(230, 194, 122, 0.45);
+  overflow: hidden;
+}
+
+/* כוכבים עדינים ברקע השבת */
+.shabbat::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 22%, rgba(255, 255, 255, 0.55), transparent),
+    radial-gradient(1px 1px at 32% 68%, rgba(255, 255, 255, 0.45), transparent),
+    radial-gradient(1.5px 1.5px at 58% 14%, rgba(245, 230, 196, 0.6), transparent),
+    radial-gradient(1px 1px at 76% 52%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1.5px 1.5px at 90% 84%, rgba(245, 230, 196, 0.5), transparent),
+    radial-gradient(1px 1px at 46% 90%, rgba(255, 255, 255, 0.35), transparent);
+  pointer-events: none;
+}
+
+.shabbat > * {
+  position: relative;
+}
+
+.shabbat h2 {
+  color: var(--gold-400);
+}
+
+.shabbat h2::before {
+  content: "🕯️";
+  font-size: 1.4rem;
+}
+
+.shabbat h2::after {
+  background: linear-gradient(to left, transparent, rgba(230, 194, 122, 0.6));
+}
+
+.shabbat .section-note {
+  color: var(--gold-200);
+}
+
+.shabbat-columns {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.shabbat-block {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(230, 194, 122, 0.25);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  backdrop-filter: blur(4px);
+}
+
+.shabbat-block h3 {
+  color: var(--gold-200);
+  font-size: 1.35rem;
+  margin-bottom: 6px;
+}
+
+.shabbat .time-list li {
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+.shabbat .time-list .t-label {
+  color: #e9edff;
+}
+
+.shabbat .time-list .t-time {
+  color: var(--gold-400);
+}
+
+.shabbat .time-list li.is-next {
+  background: rgba(230, 194, 122, 0.14);
+  margin-inline: -12px;
+  padding-inline: 12px;
+  border-radius: 10px;
+}
+
+/* ---------- שיעורי תורה ---------- */
+.lessons-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.lesson-card {
+  --accent: var(--gold-500);
+  --accent-soft: var(--mincha-soft);
+}
+
+.lesson-card .t-time {
+  font-size: 1.1rem;
+  text-align: end;
+}
+
+/* ---------- פרנסי השבוע ---------- */
+.parnasim h2 {
+  margin-bottom: 22px;
+}
+
+.parnasim-card {
+  position: relative;
+  max-width: 560px;
+  margin: 0 auto;
+  text-align: center;
+  background: var(--paper);
+  border: 1px solid var(--gold-400);
+  outline: 1px solid var(--gold-400);
+  outline-offset: -10px;
+  border-radius: var(--radius);
+  padding: 34px 28px;
+  box-shadow: var(--shadow-lg);
+}
+
+.parnasim-card p {
+  margin: 4px 0;
+  color: var(--muted);
+}
+
+.parnasim-card .highlight {
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin: 8px 0;
+  background: var(--gold-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- כותרת תחתונה ---------- */
+.footer {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.9rem;
+  padding: 28px 16px 36px;
+  background: var(--sapphire-950);
+  border-top: 3px solid var(--gold-500);
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer .copyright {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: var(--gold-400);
+}
+
+/* ---------- אנימציית הופעה בגלילה ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(36px) scale(0.98);
+  transition:
+    opacity 0.8s ease-out,
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* =========================================================
+   התאמה למסכים קטנים
+   ========================================================= */
+@media (max-width: 900px) {
+  .prayer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 40px 16px 84px;
+  }
+
+  .dates {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 28px;
+  }
+
+  .date-card {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+  }
+
+  .date-value {
+    font-size: 1.1rem;
+  }
+
+  .next-prayer {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .prayer-grid,
+  .lessons-grid,
+  .shabbat-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .shabbat {
+    padding: 28px 18px;
+  }
+
+  .section {
+    margin-top: 38px;
+  }
+}

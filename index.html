@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="זמני תפילות בית הכנסת – שחרית, מנחה, ערבית ותפילות שבת">
+  <title>זמני תפילות | מטה משה</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="logo.png">
+
+  <!-- גופנים מ-Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <!-- קובץ העיצוב -->
+  <link rel="stylesheet" href="style.css?v=3">
+</head>
+<body>
+
+  <!-- כותרת עליונה -->
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="logo-frame">
+        <img src="logo.png" alt="לוגו בית הכנסת מטה משה – היכל רבנו יורם, חולון" class="logo" width="550" height="564">
+      </div>
+      <p class="eyebrow">בית הכנסת</p>
+      <h1 id="synagogue-name">מטה משה</h1>
+      <p class="tagline" id="synagogue-tagline">״היכל רבנו יורם״</p>
+      <p class="subtitle" id="synagogue-address"></p>
+
+      <div class="dates">
+        <div class="date-card">
+          <span class="date-label">תאריך עברי</span>
+          <span class="date-value" id="hebrew-date">—</span>
+        </div>
+        <div class="date-card">
+          <span class="date-label">תאריך לועזי</span>
+          <span class="date-value" id="gregorian-date">—</span>
+        </div>
+        <div class="date-card">
+          <span class="date-label">השעה כעת</span>
+          <span class="date-value clock" id="clock">—</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- התפילה הבאה -->
+    <section class="next-prayer" id="next-prayer" aria-live="polite"></section>
+
+    <!-- תפילות ימי חול -->
+    <section class="section" aria-labelledby="weekday-title">
+      <div class="section-head">
+        <h2 id="weekday-title">תפילות ימי חול</h2>
+        <p class="section-note" id="weekday-note"></p>
+      </div>
+      <div class="prayer-grid" id="weekday-prayers">
+        <!-- הכרטיסים נוצרים אוטומטית מתוך script.js -->
+      </div>
+    </section>
+
+    <!-- תפילות שבת -->
+    <section class="section shabbat" aria-labelledby="shabbat-title">
+      <div class="section-head">
+        <h2 id="shabbat-title">תפילות שבת</h2>
+        <p class="section-note" id="shabbat-note"></p>
+      </div>
+      <div class="shabbat-columns" id="shabbat-prayers">
+        <!-- הרשימות נוצרות אוטומטית מתוך script.js -->
+      </div>
+    </section>
+
+    <!-- שיעורי תורה -->
+    <section class="section" aria-labelledby="lessons-title">
+      <div class="section-head">
+        <h2 id="lessons-title">שיעורי תורה</h2>
+      </div>
+      <div class="prayer-grid lessons-grid" id="lessons">
+        <!-- הכרטיסים נוצרים אוטומטית מתוך script.js -->
+      </div>
+    </section>
+
+    <!-- פרנסי השבוע -->
+    <section class="section parnasim" aria-labelledby="parnasim-title">
+      <h2 id="parnasim-title">פרנסי השבוע</h2>
+      <div class="parnasim-card" id="parnasim-text"></div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>© <span id="year"></span> <span id="footer-name">בית הכנסת</span></p>
+    <p class="copyright">כל הזכויות שמורות ל-<bdi>bsaviran</bdi></p>
+  </footer>
+
+  <!-- קובץ הלוגיקה והנתונים -->
+  <script src="script.js?v=3"></script>
+</body>
+</html>
