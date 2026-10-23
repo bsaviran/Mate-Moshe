@@ -267,21 +267,44 @@ function renderParnasim() {
 
 /* ---------- התפילה הבאה ---------- */
 
+const PRAYER_NAMES = Object.values(PRAYER_META).map((m) => m.name);
+
+// הכותרת בכרטיס "הבא בתור" לפי סוג האירוע
+function nextLabel(item) {
+  if (item.label.includes("שיעור")) return "הבא בבית הכנסת";
+  if (item.isPrayer || PRAYER_NAMES.some((name) => item.label.includes(name))) return "התפילה הבאה";
+  return "הבא בבית הכנסת";
+}
+
+function weekdayCandidates(keys) {
+  return keys.flatMap((key) =>
+    CONFIG.weekday[key].map((i) => {
+      // אם שם התפילה כבר כתוב בתווית (למשל "מנחה גדולה") – לא מוסיפים אותו שוב
+      const prayerName = PRAYER_META[key].name;
+      const name = i.label.includes(prayerName) ? i.label : `${prayerName} · ${i.label}`;
+      return { ...i, name, isPrayer: true, container: "#weekday-prayers" };
+    })
+  );
+}
+
+function shabbatCandidates(block) {
+  return block.items.map((i) => ({
+    ...i,
+    // "שיעור" לבד לא מספיק ברור – מוסיפים "ערב שבת" / "שבת"
+    name: i.label === "שיעור" ? `שיעור ${block.day === "friday" ? "ערב שבת" : "שבת"}` : i.label,
+    container: "#shabbat-prayers",
+  }));
+}
+
 function findNextPrayer(now) {
   const nowMin = now.getHours() * 60 + now.getMinutes();
-  const isShabbat = now.getDay() === 6;
+  const day = now.getDay();
 
-  // ביום שבת מחפשים בלוח השבת, בשאר הימים – בלוח החול
-  const candidates = isShabbat
-    ? CONFIG.shabbat.shabbatDay.items.map((i) => ({ ...i, name: i.label }))
-    : Object.entries(CONFIG.weekday).flatMap(([key, items]) =>
-        items.map((i) => {
-          // אם שם התפילה כבר כתוב בתווית (למשל "מנחה גדולה") – לא מוסיפים אותו שוב
-          const prayerName = PRAYER_META[key].name;
-          const name = i.label.includes(prayerName) ? i.label : `${prayerName} · ${i.label}`;
-          return { ...i, name };
-        })
-      );
+  // שבת: לוח השבת. שישי: שחרית של חול ואחריה תוכנית ערב שבת. שאר הימים: לוח החול.
+  let candidates;
+  if (day === 6) candidates = shabbatCandidates(CONFIG.shabbat.shabbatDay);
+  else if (day === 5) candidates = [...weekdayCandidates(["shacharit"]), ...shabbatCandidates(CONFIG.shabbat.erevShabbat)];
+  else candidates = weekdayCandidates(Object.keys(CONFIG.weekday));
 
   return candidates
     .filter((p) => p.time && toMinutes(p.time) > nowMin)
@@ -296,23 +319,30 @@ function renderNextPrayer(now) {
   document.querySelectorAll(".time-list li.is-next").forEach((li) => li.classList.remove("is-next"));
 
   if (!next) {
+    const endOfDay = {
+      5: ["שבת שלום", "נתראה בתפילות השבת"],
+      6: ["שבוע טוב", "נתראה מחר בשחרית"],
+    }[now.getDay()] || ["התפילות להיום הסתיימו", "נתראה מחר בשחרית"];
+
     box.innerHTML = `
       <div>
-        <div class="np-label">התפילה הבאה</div>
-        <div class="np-name">התפילות להיום הסתיימו</div>
+        <div class="np-label">${now.getDay() === 5 ? "ערב שבת" : "להיום"}</div>
+        <div class="np-name">${endOfDay[0]}</div>
       </div>
-      <div class="np-countdown">נתראה מחר בשחרית</div>`;
+      <div class="np-countdown">${endOfDay[1]}</div>`;
     return;
   }
 
   const diff = toMinutes(next.time) - (now.getHours() * 60 + now.getMinutes());
   const hours = Math.floor(diff / 60);
   const mins = diff % 60;
-  const countdown = hours > 0 ? `בעוד ${hours} שע׳ ו-${mins} דק׳` : mins === 1 ? "בעוד דקה" : `בעוד ${mins} דקות`;
+  let countdown;
+  if (hours > 0) countdown = mins > 0 ? `בעוד ${hours} שע׳ ו-${mins} דק׳` : `בעוד ${hours} שע׳`;
+  else countdown = mins === 1 ? "בעוד דקה" : `בעוד ${mins} דקות`;
 
   box.innerHTML = `
     <div>
-      <div class="np-label">התפילה הבאה</div>
+      <div class="np-label">${nextLabel(next)}</div>
       <div class="np-name"></div>
     </div>
     <div>
@@ -322,8 +352,7 @@ function renderNextPrayer(now) {
   box.querySelector(".np-name").textContent = next.name;
 
   // סימון השורה המתאימה ברשימה
-  const container = now.getDay() === 6 ? "#shabbat-prayers" : "#weekday-prayers";
-  document.querySelectorAll(`${container} li[data-time="${next.time}"]`).forEach((li) => {
+  document.querySelectorAll(`${next.container} li[data-time="${next.time}"]`).forEach((li) => {
     if (li.querySelector(".t-label").textContent === next.label) li.classList.add("is-next");
   });
 }
