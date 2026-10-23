@@ -550,7 +550,7 @@ function tick() {
 function init() {
   const suffix = CONFIG.isSample ? SAMPLE_SUFFIX : "";
 
-  document.title = `זמני תפילות | ${CONFIG.synagogueName}`;
+  document.title = `זמני תפילות | בית כנסת ${CONFIG.synagogueName}`;
   document.getElementById("synagogue-name").textContent = CONFIG.synagogueName;
   document.getElementById("synagogue-tagline").textContent = CONFIG.tagline;
   document.getElementById("synagogue-address").textContent = CONFIG.address;
