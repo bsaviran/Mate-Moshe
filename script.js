@@ -30,6 +30,8 @@ const CONFIG = {
 
   // עיגול זמני תפילות שמחושבים לפי נוסחה (בדקות), כמו ב-MyGabay. 1 = ללא עיגול.
   roundToMinutes: 5,
+  // כיוון העיגול: "up" = כלפי מעלה (כמו ב-MyGabay), "down" = כלפי מטה, "nearest" = לקרוב ביותר
+  roundDirection: "up",
 
   // ---------- תפילות ימי חול (מחושבות לפי זמני היום) ----------
   weekdayNote: "",
@@ -316,7 +318,10 @@ function renderNextPrayer(now) {
   const next = findNextPrayer(now);
 
   // הסרת סימון "הבאה" קודם
-  document.querySelectorAll(".time-list li.is-next").forEach((li) => li.classList.remove("is-next"));
+  document.querySelectorAll(".time-list li.is-next").forEach((li) => {
+    li.classList.remove("is-next");
+    delete li.querySelector(".t-label").dataset.badge;
+  });
 
   if (!next) {
     const endOfDay = {
@@ -353,7 +358,11 @@ function renderNextPrayer(now) {
 
   // סימון השורה המתאימה ברשימה
   document.querySelectorAll(`${next.container} li[data-time="${next.time}"]`).forEach((li) => {
-    if (li.querySelector(".t-label").textContent === next.label) li.classList.add("is-next");
+    const label = li.querySelector(".t-label");
+    if (label.textContent !== next.label) return;
+    li.classList.add("is-next");
+    // התאמת המגדר: "התפילה הבאה" / "השיעור הבא"
+    label.dataset.badge = nextLabel(next) === "התפילה הבאה" ? "הבאה" : "הבא";
   });
 }
 
@@ -386,9 +395,10 @@ function offsetToSeconds(offset = "0:00") {
   return sign * (h * 3600 + m * 60);
 }
 
-// עיגול לכפולה הקרובה של roundTo דקות (למשל 16:53:50 -> 16:55)
+// עיגול לכפולה של roundTo דקות לפי CONFIG.roundDirection (למשל 18:12:21 -> 18:15 בעיגול למעלה)
 function secondsToTime(seconds, roundTo = 1) {
-  const totalMin = Math.round(seconds / 60 / roundTo) * roundTo;
+  const round = { up: Math.ceil, down: Math.floor }[CONFIG.roundDirection] || Math.round;
+  const totalMin = round(seconds / 60 / roundTo) * roundTo;
   return `${pad(Math.floor(totalMin / 60))}:${pad(totalMin % 60)}`;
 }
 

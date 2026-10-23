@@ -480,7 +480,7 @@ h3 {
 }
 
 .time-list li.is-next .t-label::after {
-  content: "הבאה";
+  content: attr(data-badge);
   font-size: 0.7rem;
   background: var(--gold-gradient);
   color: #fff;
