@@ -328,10 +328,11 @@ function renderNextPrayer(now) {
       5: ["שבת שלום", "נתראה בתפילות השבת"],
       6: ["שבוע טוב", "נתראה מחר בשחרית"],
     }[now.getDay()] || ["התפילות להיום הסתיימו", "נתראה מחר בשחרית"];
+    const label = { 5: "ערב שבת", 6: "" }[now.getDay()] ?? "להיום";
 
     box.innerHTML = `
       <div>
-        <div class="np-label">${now.getDay() === 5 ? "ערב שבת" : "להיום"}</div>
+        ${label ? `<div class="np-label">${label}</div>` : ""}
         <div class="np-name">${endOfDay[0]}</div>
       </div>
       <div class="np-countdown">${endOfDay[1]}</div>`;
