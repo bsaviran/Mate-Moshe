@@ -42,10 +42,10 @@ const CONFIG = {
     ],
     mincha: [
       { label: "מנחה גדולה", time: "13:10" },
-      { label: "מנחה", base: "tzeit", offset: "-0:45" },
+      { label: "מנחה", time: "16:35" },
     ],
     arvit: [
-      { label: "ערבית", base: "tzeit", offset: "+0:00" },
+      { label: "ערבית", time: "17:00" },
       { label: "ערבית מניין שני", time: "21:15" },
     ],
   },
@@ -59,8 +59,8 @@ const CONFIG = {
       day: "friday",
       items: [
         { label: "שיעור", base: "sunset", offset: "-1:15" },
-        { label: "שיר השירים", base: "sunset", offset: "-0:45" },
-        { label: "מנחה" },
+        { label: "מנחה", base: "sunset", offset: "-0:45" },
+        { label: "שיר השירים" },
       ],
     },
     shabbatDay: {
