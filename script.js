@@ -42,7 +42,7 @@ const CONFIG = {
     ],
     mincha: [
       { label: "מנחה גדולה", time: "13:10" },
-      { label: "מנחה", time: "16:35" },
+      { label: "מנחה", time: "16:25" },
     ],
     arvit: [
       { label: "ערבית", time: "17:00" },
