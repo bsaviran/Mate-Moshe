@@ -313,6 +313,20 @@ function findNextPrayer(now) {
     .sort((a, b) => toMinutes(a.time) - toMinutes(b.time))[0];
 }
 
+let lastAnnounced = null; // ההודעה האחרונה שנמסרה לקוראי מסך
+
+// עדכון הכרטיס רק כשהתוכן השתנה, והודעה לקוראי מסך רק כשהתפילה הבאה מתחלפת
+function updateNextBox(box, html, announcement) {
+  if (box.dataset.html !== html) {
+    box.innerHTML = html;
+    box.dataset.html = html;
+  }
+  if (lastAnnounced !== null && announcement !== lastAnnounced) {
+    document.getElementById("next-prayer-announce").textContent = announcement;
+  }
+  lastAnnounced = announcement;
+}
+
 function renderNextPrayer(now) {
   const box = document.getElementById("next-prayer");
   const next = findNextPrayer(now);
@@ -330,12 +344,12 @@ function renderNextPrayer(now) {
     }[now.getDay()] || ["התפילות להיום הסתיימו", "נתראה מחר בשחרית"];
     const label = { 5: "ערב שבת", 6: "" }[now.getDay()] ?? "להיום";
 
-    box.innerHTML = `
+    updateNextBox(box, `
       <div>
         ${label ? `<div class="np-label">${label}</div>` : ""}
         <div class="np-name">${endOfDay[0]}</div>
       </div>
-      <div class="np-countdown">${endOfDay[1]}</div>`;
+      <div class="np-countdown">${endOfDay[1]}</div>`, `${endOfDay[0]}. ${endOfDay[1]}`);
     return;
   }
 
@@ -346,16 +360,20 @@ function renderNextPrayer(now) {
   if (hours > 0) countdown = mins > 0 ? `בעוד ${hours} שע׳ ו-${mins} דק׳` : `בעוד ${hours} שע׳`;
   else countdown = mins === 1 ? "בעוד דקה" : `בעוד ${mins} דקות`;
 
-  box.innerHTML = `
+  // השם מגיע מההגדרות – מוסיפים אותו כטקסט ולא כ-HTML
+  const name = document.createElement("div");
+  name.className = "np-name";
+  name.textContent = next.name;
+
+  updateNextBox(box, `
     <div>
       <div class="np-label">${nextLabel(next)}</div>
-      <div class="np-name"></div>
+      ${name.outerHTML}
     </div>
     <div>
       <div class="np-time">${next.time}</div>
       <div class="np-countdown">${countdown}</div>
-    </div>`;
-  box.querySelector(".np-name").textContent = next.name;
+    </div>`, `${nextLabel(next)}: ${next.name}, בשעה ${next.time}`);
 
   // סימון השורה המתאימה ברשימה
   document.querySelectorAll(`${next.container} li[data-time="${next.time}"]`).forEach((li) => {
@@ -403,21 +421,52 @@ function secondsToTime(seconds, roundTo = 1) {
   return `${pad(Math.floor(totalMin / 60))}:${pad(totalMin % 60)}`;
 }
 
-async function fetchZmanim(date) {
-  const { latitude, longitude, tzid } = CONFIG.location;
-  const url = `${HEBCAL_URL}/zmanim?cfg=json&sec=1&latitude=${latitude}&longitude=${longitude}&tzid=${tzid}&date=${isoDate(date)}`;
+// תשובות Hebcal נשמרות בדפדפן לפי הכתובת (שכוללת את התאריך והמיקום).
+// הזמנים של תאריך מסוים לא משתנים, כך שבטעינה חוזרת אין צורך לחכות לרשת.
+const CACHE_PREFIX = "hebcal:";
+
+async function fetchJson(url) {
+  try {
+    const cached = localStorage.getItem(CACHE_PREFIX + url);
+    if (cached) return JSON.parse(cached);
+  } catch (e) {
+    // אין גישה לאחסון (למשל גלישה פרטית) – ממשיכים לרשת
+  }
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Hebcal ${res.status}`);
-  return (await res.json()).times;
+  const data = await res.json();
+  try {
+    localStorage.setItem(CACHE_PREFIX + url, JSON.stringify(data));
+  } catch (e) {}
+  return data;
+}
+
+// מחיקת תשובות של תאריכים שעברו – נשארות רק הכתובות שבשימוש כעת
+function pruneCache(urls) {
+  try {
+    Object.keys(localStorage)
+      .filter((key) => key.startsWith(CACHE_PREFIX) && !urls.includes(key.slice(CACHE_PREFIX.length)))
+      .forEach((key) => localStorage.removeItem(key));
+  } catch (e) {}
+}
+
+function zmanimUrl(date) {
+  const { latitude, longitude, tzid } = CONFIG.location;
+  return `${HEBCAL_URL}/zmanim?cfg=json&sec=1&latitude=${latitude}&longitude=${longitude}&tzid=${tzid}&date=${isoDate(date)}`;
+}
+
+function parashaUrl(friday) {
+  const { latitude, longitude, tzid } = CONFIG.location;
+  return `${HEBCAL_URL}/shabbat?cfg=json&leyning=off&latitude=${latitude}&longitude=${longitude}&tzid=${tzid}` +
+    `&gy=${friday.getFullYear()}&gm=${friday.getMonth() + 1}&gd=${friday.getDate()}`;
+}
+
+async function fetchZmanim(date) {
+  return (await fetchJson(zmanimUrl(date))).times;
 }
 
 async function fetchParasha(friday) {
-  const { latitude, longitude, tzid } = CONFIG.location;
-  const url = `${HEBCAL_URL}/shabbat?cfg=json&leyning=off&latitude=${latitude}&longitude=${longitude}&tzid=${tzid}` +
-    `&gy=${friday.getFullYear()}&gm=${friday.getMonth() + 1}&gd=${friday.getDate()}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Hebcal ${res.status}`);
-  const item = (await res.json()).items.find((i) => i.category === "parashat");
+  const item = (await fetchJson(parashaUrl(friday))).items.find((i) => i.category === "parashat");
   return item ? item.hebrew.replace("־", " ") : "";
 }
 
@@ -452,6 +501,7 @@ async function loadZmanimTimes() {
   const saturday = new Date(friday);
   saturday.setDate(friday.getDate() + 1);
   zmanimDate = isoDate(today);
+  pruneCache([today, friday, saturday].map(zmanimUrl).concat(parashaUrl(friday)));
 
   try {
     const [todayZmanim, fridayZmanim, saturdayZmanim, parasha] = await Promise.all([
@@ -560,6 +610,9 @@ function init() {
   document.getElementById("weekday-note").textContent = CONFIG.weekdayNote + suffix;
   renderLessons();
   renderParnasim();
+  // הצגה מיידית של התפילות בשעות הקבועות (כדי שהעמוד לא "יקפוץ"), והשלמת השעות המחושבות כשהן מגיעות
+  renderWeekday();
+  renderShabbat();
   setupLightbox();
   tick();
 
@@ -570,4 +623,6 @@ function init() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", init);
+// הסקריפט נטען עם defer, כך שכשהוא רץ העמוד כבר קיים – מפעילים מיד, לפני ההצגה הראשונה
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+else init();

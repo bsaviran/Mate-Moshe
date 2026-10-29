@@ -5,16 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="זמני תפילות בית הכנסת – שחרית, מנחה, ערבית ותפילות שבת">
   <title>זמני תפילות | בית כנסת מטה משה</title>
-  <link rel="icon" href="logo.jpeg" type="image/jpeg">
-  <link rel="apple-touch-icon" href="logo.jpeg">
+  <link rel="icon" href="img/favicon-48.png" type="image/png">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.jpg">
 
-  <!-- גופנים מ-Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- טעינה מוקדמת: תמונת הרקע העליונה (הרכיב הגדול בעמוד) והגופנים (הלטיניים כוללים את הספרות של השעות) -->
+  <link rel="preload" href="img/synagogue-900.webp" as="image" type="image/webp" fetchpriority="high" media="(max-width: 640px)">
+  <link rel="preload" href="img/synagogue-1520.webp" as="image" type="image/webp" fetchpriority="high" media="(min-width: 641px)">
+  <link rel="preload" href="fonts/heebo-hebrew.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/frank-ruhl-libre-hebrew.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/frank-ruhl-libre-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/heebo-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <!-- חיבור מוקדם לשרת זמני היום -->
+  <link rel="preconnect" href="https://www.hebcal.com" crossorigin>
 
-  <!-- קובץ העיצוב -->
-  <link rel="stylesheet" href="style.css?v=26">
+  <!-- קובץ העיצוב (כולל הגופנים) -->
+  <link rel="stylesheet" href="style.css?v=27">
+  <!-- קובץ הלוגיקה והנתונים. נטען במקביל לעיצוב, והעמוד מוצג רק אחרי שהזמנים הוכנסו (כדי שלא "יקפוץ") -->
+  <script src="script.js?v=27" defer blocking="render"></script>
 </head>
 <body>
 
@@ -24,12 +31,15 @@
     <div class="hero-bg" aria-hidden="true"></div>
     <div class="hero-inner">
       <div class="logo-frame">
-        <img src="logo.jpeg" alt="לוגו בית הכנסת מטה משה – היכל רבנו יורם, חולון" class="logo" width="640" height="640">
+        <picture>
+          <source srcset="img/logo-480.webp" type="image/webp">
+          <img src="logo.jpeg" alt="לוגו בית הכנסת מטה משה – היכל רבנו יורם, חולון" class="logo" width="640" height="640">
+        </picture>
       </div>
       <p class="eyebrow">בית הכנסת</p>
       <h1 id="synagogue-name">מטה משה</h1>
       <p class="tagline" id="synagogue-tagline">״היכל רבנו יורם״</p>
-      <p class="subtitle" id="synagogue-address"></p>
+      <p class="subtitle" id="synagogue-address">רחוב החרצית 5, חולון</p>
 
       <div class="dates">
         <div class="date-card">
@@ -50,7 +60,19 @@
   <main class="container">
 
     <!-- התפילה הבאה -->
-    <section class="next-prayer" id="next-prayer" aria-live="polite"></section>
+    <!-- שלד זמני באותו גודל כמו התוכן הסופי (כדי שהעמוד לא "יקפוץ" בטעינה). script.js ממלא אותו. -->
+    <section class="next-prayer" id="next-prayer" aria-label="הבא בבית הכנסת">
+      <div>
+        <div class="np-label">התפילה הבאה</div>
+        <div class="np-name">&nbsp;</div>
+      </div>
+      <div>
+        <div class="np-time">--:--</div>
+        <div class="np-countdown">&nbsp;</div>
+      </div>
+    </section>
+    <!-- הודעה לקוראי מסך – מתעדכנת רק כשהתפילה הבאה מתחלפת (ולא בכל דקה) -->
+    <p class="sr-only" id="next-prayer-announce" aria-live="polite" aria-atomic="true"></p>
 
     <!-- תפילות ימי חול -->
     <section class="section" aria-labelledby="weekday-title">
@@ -89,9 +111,12 @@
       <div class="section-head">
         <h2 id="kollel-title">כולל אברכים מצטיינים ״מטה משה״</h2>      </div>
       <figure class="gallery-frame">
-        <button type="button" class="gallery-open" id="kollel-open" aria-label="הגדלת תמונת אברכי הכולל">
-          <img src="kollel.jpg" alt="אברכי כולל מטה משה, שנת תשפ״ו" width="2758" height="1548" loading="lazy">
-          <span class="zoom-badge" aria-hidden="true">🔍 לחצו להגדלה</span>
+        <button type="button" class="gallery-open" id="kollel-open" aria-haspopup="dialog">
+          <picture>
+            <source type="image/webp" srcset="img/kollel-1100.webp 1100w, img/kollel-2000.webp 2000w" sizes="(max-width: 1100px) calc(100vw - 44px), 1056px">
+            <img src="img/kollel-1100.jpg" alt="אברכי כולל מטה משה, שנת תשפ״ו" width="2758" height="1548" loading="lazy" decoding="async">
+          </picture>
+          <span class="zoom-badge"><span aria-hidden="true">🔍 </span>לחצו להגדלה</span>
         </button>
       </figure>
     </section>
@@ -112,12 +137,13 @@
   <!-- חלון הגדלת תמונה -->
   <dialog class="lightbox" id="lightbox" aria-label="תמונה מוגדלת">
     <button type="button" class="lightbox-close" id="lightbox-close" aria-label="סגירה">✕</button>
-    <div class="lightbox-scroll">
-      <img src="kollel.jpg" alt="אברכי כולל מטה משה, שנת תשפ״ו">
+    <!-- tabindex: כדי שאפשר יהיה לגלול את התמונה גם במקלדת -->
+    <div class="lightbox-scroll" tabindex="0" role="region" aria-label="תמונת אברכי הכולל, ניתן לגלול">
+      <picture>
+        <source srcset="img/kollel-2758.webp" type="image/webp">
+        <img src="kollel.jpg" alt="אברכי כולל מטה משה, שנת תשפ״ו" width="2758" height="1548" loading="lazy" decoding="async">
+      </picture>
     </div>
   </dialog>
-
-  <!-- קובץ הלוגיקה והנתונים -->
-  <script src="script.js?v=26"></script>
 </body>
 </html>
