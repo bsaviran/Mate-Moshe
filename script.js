@@ -58,8 +58,8 @@ const CONFIG = {
       title: "ערב שבת",
       day: "friday",
       items: [
-        { label: "שיעור", base: "sunset", offset: "-1:15" },
-        { label: "מנחה", base: "sunset", offset: "-0:45" },
+        { label: "שיעור", base: "sunset", offset: "-0:55" },
+        { label: "מנחה", base: "sunset", offset: "-0:25" },
         { label: "שיר השירים" },
       ],
     },
@@ -69,7 +69,7 @@ const CONFIG = {
       items: [
         { label: "שיעור", time: "06:45" },
         { label: "שחרית – הודו", time: "08:10" },
-        { label: "שיעור", base: "motzaeiShabbat", offset: "-3:35" },
+        { label: "שיעור", time: "14:30" },
         { label: "מנחה", base: "motzaeiShabbat", offset: "-1:35" },
         { label: "ערבית מוצאי שבת", base: "motzaeiShabbat", offset: "-0:15" },
       ],
@@ -85,7 +85,7 @@ const CONFIG = {
       items: [
         { label: "יום ג׳ – שיעור בשיר השירים", time: "לאחר תפילת הנץ" },
         { label: "יום ג׳ – שיעור תניא והלכה", time: "20:00-21:15" },
-        { label: "יום ד׳ – שיעור תניא, בצור ירום", time: "18:00 עד מנחה" },
+        { label: "יום ד׳ – שיעור תניא, בצור ירום", time: "20:00-21:00" },
         { label: "יום ה׳ – שיעור תניא, בצור ירום", time: "12:00-13:00" },
       ],
     },
